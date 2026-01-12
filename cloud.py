@@ -8,7 +8,7 @@ import hashlib
 import secrets
 username = input("Enter your cloud username: ")
 password = getpass.getpass("Enter your cloud password: ")
-hash = hashlib.sha256(password.encode()).hexdigest()  
+pass_hash = hashlib.sha256(password.encode()).hexdigest()  
 new = datetime.datetime.now()
 
 def cloud ():
@@ -19,7 +19,7 @@ def cloud ():
         with open ("db.json", "r+") as file:
             data = json.load(file)
             
-        if username in data["users"] and hash == data["users"][username]["password"] and data["users"][username]["role"] == "admin":         #HACKER
+        if username in data["users"] and pass_hash == data["users"][username]["password"] and data["users"][username]["role"] == "admin":         #HACKER
             
              print("Access granted.")
              if "key_rotation_days" not in data["config"]:
@@ -58,7 +58,7 @@ def cloud ():
                             print("Creatring EC2 instance....")
                             print(f"Folder '{folder}' created successfully.")
                             
-                            data["Folder"]["S3"][folder] = {
+                            data["Folder"]["EC2"][folder] = {
                              "permission": [".pdf",".png",".jpg",".jpeg",".txt",".py",".cpp"]
               
                          }
@@ -144,7 +144,7 @@ def cloud ():
                 case _:
                     print("Invalid choice.")
                     
-        elif username in data["users"] and hash == data["users"][username]["password"] and data["users"][username]["role"] == "developer":        #password123
+        elif username in data["users"] and pass_hash == data["users"][username]["password"] and data["users"][username]["role"] == "developer":        #password123
             print("Access granted.")
             print("Welcome to the cloud configuration, developer.")
             logs_save()
@@ -220,6 +220,7 @@ def cloud ():
                      with open(file, "w") as f:
                       f.write(code)
                       print(f"Code written to {file} successfully.")
+                      log = False
                 case 4:
                     policy()
                     with open("polcy.json" ,"r")as file :
@@ -238,25 +239,29 @@ def cloud ():
                             print("Output: \n ")
                          except FileNotFoundError:
                            print(f"File {file} not found.")
+                           log = False
                          if result_compile.returncode != 0 :
                             print("Compile error")
+                            log = False
                          else :
                             result = subprocess.run([f"{exe}.exe"],stdout = subprocess.PIPE ,text = True)
-                            print(result.stdout) 
+                            print(result.stdout)
+                            log = False 
                     else :
                          try :
                            result = subprocess.run(["python", file], stdout = subprocess.PIPE , text =True)
                            print(f"Executed {file} successfully.")
                            print("Output:\n", result.stdout)
                          except FileNotFoundError :
-                            print(f"File {file} not found.")          
+                            print(f"File {file} not found.")  
+                         log = False        
                 case 5: 
                     policy()
                     with open("polcy.json" ,"r")as file :
                        data = json.load(file)     
-                    folder = os.getcwd()
-                 
-                    folder = os.path.relpath(folder, r"D:\new")
+                    BASE_DIR = os.path.abspath(os.getcwd())
+                    current_dir = os.path.abspath(os.getcwd())
+                    folder = os.path.relpath(current_dir, BASE_DIR)
                     print(folder)
                     if folder in data["Folder"]["S3"] :
                      file = input("Enter the file name to write file with format : ")
@@ -274,13 +279,15 @@ def cloud ():
                         with open(file, "w") as f:
                             f.write(code)
                             print(f"Code written to {file} successfully.")
+                        log = False
                      else: 
                          print("You are in S3 Bucket. You haven't permission to make Executable file. ")
+                         log = False
                 case 6:
                     return
                 case _:
                  print("Invalid choice.")                    
-        elif  username in data["users"] and hash == data["users"][username]["password"] and data["users"][username]["role"] == "tester":            #pass456
+        elif  username in data["users"] and pass_hash == data["users"][username]["password"] and data["users"][username]["role"] == "tester":            #pass456
             print("Access granted.")
             print("Welcome to the cloud configuration, tester.")
             logs_save() 
@@ -309,6 +316,7 @@ def cloud ():
                       print("File not found ")
                 case 3:
                     policy()
+                    log = False
                 case 4:
                     return
                 case _:
@@ -340,6 +348,9 @@ def alert():
             data = json.load(file)
     if choice == 1:
                newpassword = getpass.getpass("Enter the new password :")
+               if len(newpassword) < 8:
+                    print("Password must be at least 8 characters")
+                    return
                ha = hashlib.sha256(newpassword.encode()).hexdigest() 
                data["users"][username]["key_created"] = str (new)
                data["users"][username]["password"] = ha
@@ -372,23 +383,36 @@ def policy ():
     for vm_name in ls["Folder"]["S3"]:
         print("-", vm_name)
     folder = input("To move in folder and Enter the folder name : ")
-    os.chdir(folder)
-    if folder in ls["Folder"]["EC2"] :
+    
+    if folder in ls["Folder"]["EC2"] or folder in ls["Folder"]["S3"]:
+     os.chdir(folder)
+    
+     if folder in ls["Folder"]["EC2"] :
         print("You are in EC2 folder : ")
-        print("To see file in presss 1")
+        print("1.To see file ")
+        print("2.Exit")
         d = int(input("Enter your choice :"))
         if d ==1 :
-            subprocess.run(["cmd","/c","dir"],text =True) 
+            for f in os.listdir():
+              print(f) 
+        elif d ==2 :
+            return 0
+        else: 
+            print("Invalid choice")
+     else:
+        print("You are in S3 buckets")
+        print("To see file in presss 1")
+        print("2.Exit")
+        d = int(input("Enter your choice :"))
+        if d ==1 :
+            for f in os.listdir():
+              print(f)
+        elif d ==2 :
+            return
         else: 
             print("Invalid choice")
     else:
-        print("You are in S3 buckets")
-        print("To see file in presss 1")
-        d = int(input("Enter your choice :"))
-        if d ==1 :
-            subprocess.run(["cmd","/c", "dir"],text =True) 
-        else: 
-            print("Invalid choice")   
+        print("folder is not exit in current dir ")   
 cloud()
 
 
