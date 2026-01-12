@@ -1,0 +1,27 @@
+{
+    "config": {
+        "key_rotation_days": 30
+    },
+    "permissions": {
+        "admin": ["add_user", "delete_user", "view_logs"],
+        "developer": ["deploy_code", "view_logs"],
+        "tester": ["run_tests", "view_logs"]
+    },
+    "users": {
+        "Dipanshu": {
+            "password": "6b2c3f5acf9b6d511b8b03012e70f27c9f4d8a9a467af7928f9c0265a8ce706f",
+            "role": "admin",
+            "key_created": "2026-01-07 00:04:44.703842"
+        },
+        "user1": {
+            "password": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+            "role": "developer",
+            "key_created": "2026-01-15T00:00:00"
+        },
+        "user2": {
+            "password": "1d4598d1949b47f7f211134b639ec32238ce73086a83c2f745713b3f12f817e5",
+            "role": "tester",
+            "key_created": "2026-01-15T00:00:00"
+        }
+    }
+}

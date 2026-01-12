@@ -1,0 +1,39 @@
+{
+    "Folder": {
+        "S3": {
+            "SG": {
+                "permission": [
+                    ".pdf",
+                    ".png",
+                    ".jpg",
+                    ".jpeg",
+                    ".txt"
+                ]
+            },
+            "Hell": {
+                "permission": [
+                    ".pdf",
+                    ".png",
+                    ".jpg",
+                    ".jpeg",
+                    ".txt",
+                    ".py",
+                    ".cpp"
+                ]
+            }
+        },
+        "EC2": {
+            "DataScience": {
+                "permisssion": [
+                    ".pdf",
+                    ".png",
+                    ".jpg",
+                    ".jpeg",
+                    ".txt",
+                    ".py",
+                    ".cpp"
+                ]
+            }
+        }
+    }
+}
